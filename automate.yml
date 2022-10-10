@@ -1,0 +1,39 @@
+---
+ - hosts: all
+   become: yes
+   become_method: 'sudo'
+
+   tasks:
+    - name: Updating the apt package index
+      apt: update_cache=yes
+
+    - name: Install Apache 
+      apt:
+       name: apache2
+       state: latest
+
+    - name: Start Apache service
+      service:
+       name: apache2
+       enabled: yes
+
+    - name: Install Php
+      apt: 
+       name: php
+       state: present
+
+    - name: Add apache php library
+      command: apt install -y libapache2-mod-php
+
+    - name: Set Timezone to Africa/Lagos
+      command: timedatectl set-timezone Africa/Lagos
+    
+    - name: Copy index.php from control vm to target vm
+      copy:
+       src: /home/vagrant/ansible/ansible_tutorials/index.php
+       dest: /var/www/html/index.php
+
+    - name: Remove index.html file
+      file:
+       name: /var/www/html/index.html
+       state: absent
